@@ -1,5 +1,3 @@
-import sys
-
 for i in range(0, 22):
     types = set()
     d = (i+1) * 2

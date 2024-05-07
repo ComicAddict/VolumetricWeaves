@@ -1,0 +1,227 @@
+from itertools import combinations_with_replacement
+from itertools import combinations
+import more_itertools as mit
+
+def ISHFTC(n, d, N):
+	return ((n << d) % (1 << N)) | (n >> (N - d))
+
+def reverseBits(n, N):
+	return int('{:0{N}b}'.format(n, N=N)[::-1], 2)
+
+def shiftX(w, d, N):
+	if d % 2 == 1:
+		return (ISHFTC(w[0], d, N), 2**N-1-w[1] ,2**N-1-w[2])
+	else:
+		return (ISHFTC(w[0], d, N), w[1] , w[2])
+
+def shiftY(w, d, N):
+	if d % 2 == 1:
+		return (2**N-1-w[0], ISHFTC(w[1], d, N), 2**N-1-w[2])
+	else:
+		return (w[0], ISHFTC(w[1], d, N), w[2])
+
+def shiftZ(w, d, N):
+	if d % 2 == 1:
+		return (2**N-1-w[0], 2**N-1-w[1], ISHFTC(w[2], d, N))
+	else:
+		return (w[0], w[1], ISHFTC(w[2], d, N))
+
+def rotateX(w, N):
+	return (w[0], 2**N-1-reverseBits(w[2], N), 2**N-1-w[1])
+
+def rotateY(w, N):
+	return (w[2], w[1], reverseBits(w[0], N))
+
+def rotateZ(w, N):
+	return (2**N-1-reverseBits(w[1], N), 2**N-1-w[0], w[2])
+
+def mirrorX(w,N):
+	return (2**N-1-reverseBits(w[0], N), 2**N-1-w[1], 2**N-1-w[2])
+
+def mirrorY(w,N):
+	return ( 2**N-1-w[0], 2**N-1-reverseBits(w[1], N), 2**N-1-w[2])
+
+def mirrorZ(w,N):
+	return (2**N-1-w[0], 2**N-1-w[1], 2**N-1-reverseBits(w[2], N))
+
+for m in range(0, 3):
+	all_types = set()
+	base_types = []
+	type_classes = []
+	N = (m+1) * 2
+	print("Processing ", N, " length binary sequences")
+	c = 0
+	num_sequences = 2**(N)
+	for i in range(num_sequences):
+		for j in range(num_sequences):
+			for k in range(num_sequences):
+				current_items = set()
+				w = (i,j,k)
+				# current_items.update(mit.distinct_permutations(w))
+				current_items.add(w)
+				wx = rotateX(w, N)
+				wy = rotateY(w, N)
+				wz = rotateZ(w, N)
+				wxx = rotateX(wx, N)
+				wyy = rotateY(wy, N)
+				wzz = rotateZ(wz, N)
+				wxy = rotateY(wx, N)
+				wyz = rotateZ(wy, N)
+				wzx = rotateX(wz, N)
+				current_items.add(wx)
+				current_items.add(wy)
+				current_items.add(wz)
+				current_items.add(wxx)
+				current_items.add(wyy)
+				current_items.add(wzz)
+				current_items.add(wxy)
+				current_items.add(wyz)
+				current_items.add(wzx)
+				# current_items.add(mirrorX(w, N))
+				# current_items.add(mirrorY(w, N))
+				# current_items.add(mirrorZ(w, N))
+				for ii in range(N):
+					for jj in range(N):
+						for kk in range(N):
+							w1 = shiftZ(shiftY(shiftX(w,ii,N),jj,N),kk,N)
+							current_items.add(w1)
+							wx = rotateX(w1, N)
+							wy = rotateY(w1, N)
+							wz = rotateZ(w1, N)
+							wxx = rotateX(wx, N)
+							wyy = rotateY(wy, N)
+							wzz = rotateZ(wz, N)
+							wxy = rotateY(wx, N)
+							wyz = rotateZ(wy, N)
+							wzx = rotateX(wz, N)
+							current_items.add(wx)
+							current_items.add(wy)
+							current_items.add(wz)
+							current_items.add(wxx)
+							current_items.add(wyy)
+							current_items.add(wzz)
+							current_items.add(wxy)
+							current_items.add(wyz)
+							current_items.add(wzx)
+
+							# current_items.add(mirrorX(w1, N))
+							# current_items.add(mirrorY(w1, N))
+							# current_items.add(mirrorZ(w1, N))
+							# current_items.update(mit.distinct_permutations(w1))
+
+				isUniqueClass = True
+				for t in type_classes:
+					itemFound = False
+					if t.intersection(current_items):
+						t.update(current_items)
+						isUniqueClass = False
+
+				if isUniqueClass:
+					type_classes.append(current_items)
+				# if any(item in all_types for item in current_items):
+				# 	all_types.update(current_items)
+				# else:
+				# 	c += 1
+				# 	all_types.update(current_items)
+	
+	# for c1, c2 in combinations(type_classes,2):
+	# 	if c1.intersection(c2):
+	# 		c1.update(c2)
+	# 		c2.update(c1)
+	# res = set(map(frozenset, type_classes))
+	print("Number of classes: ", len(type_classes))
+
+	# all_types1 = set()
+	# base_types = []
+	# type_classes1 = []
+	# N = (m+1) * 2
+	# print("Processing ", N, " length binary sequences")
+	# c = 0
+	# num_sequences = 2**(N)
+	# for i in range(num_sequences):
+	# 	for j in range(num_sequences):
+	# 		for k in range(num_sequences):
+	# 			current_items = set()
+	# 			w = (i,j,k)
+	# 			current_items.update(mit.distinct_permutations(w))
+	# 			current_items.add(w)
+	# 			wx = rotateX(w, N)
+	# 			wy = rotateY(w, N)
+	# 			wz = rotateZ(w, N)
+	# 			wxx = rotateX(wx, N)
+	# 			wyy = rotateY(wy, N)
+	# 			wzz = rotateZ(wz, N)
+	# 			wxy = rotateY(wx, N)
+	# 			wyz = rotateZ(wy, N)
+	# 			wzx = rotateX(wz, N)
+	# 			current_items.add(wx)
+	# 			current_items.add(wy)
+	# 			current_items.add(wz)
+	# 			current_items.add(wxx)
+	# 			current_items.add(wyy)
+	# 			current_items.add(wzz)
+	# 			current_items.add(wxy)
+	# 			current_items.add(wyz)
+	# 			current_items.add(wzx)
+	# 			# current_items.add(mirrorX(w, N))
+	# 			# current_items.add(mirrorY(w, N))
+	# 			# current_items.add(mirrorZ(w, N))
+	# 			for ii in range(N):
+	# 				for jj in range(N):
+	# 					for kk in range(N):
+	# 						w1 = shiftZ(shiftY(shiftX(w,ii,N),jj,N),kk,N)
+	# 						current_items.add(w1)
+	# 						wx = rotateX(w1, N)
+	# 						wy = rotateY(w1, N)
+	# 						wz = rotateZ(w1, N)
+	# 						wxx = rotateX(wx, N)
+	# 						wyy = rotateY(wy, N)
+	# 						wzz = rotateZ(wz, N)
+	# 						wxy = rotateY(wx, N)
+	# 						wyz = rotateZ(wy, N)
+	# 						wzx = rotateX(wz, N)
+	# 						current_items.add(wx)
+	# 						current_items.add(wy)
+	# 						current_items.add(wz)
+	# 						current_items.add(wxx)
+	# 						current_items.add(wyy)
+	# 						current_items.add(wzz)
+	# 						current_items.add(wxy)
+	# 						current_items.add(wyz)
+	# 						current_items.add(wzx)
+
+	# 						# current_items.add(mirrorX(w1, N))
+	# 						# current_items.add(mirrorY(w1, N))
+	# 						# current_items.add(mirrorZ(w1, N))
+	# 						current_items.update(mit.distinct_permutations(w1))
+
+	# 			isUniqueClass = True
+	# 			for t in type_classes1:
+	# 				itemFound = False
+	# 				if any(item in t for item in current_items):
+	# 					t.update(current_items)
+	# 					itemFound = True
+	# 					isUniqueClass = False
+
+	# 			if isUniqueClass:
+	# 				type_classes1.append(current_items)
+	# 			# if any(item in all_types for item in current_items):
+	# 			# 	all_types.update(current_items)
+	# 			# else:
+	# 			# 	c += 1
+	# 			# 	all_types.update(current_items)
+	# for i in range(len(type_classes)):
+	# 	for j in range(len(type_classes)):
+	# 		if type_classes[i].intersection(type_classes[j]):
+	# 			type_classes[i].update(type_classes[j])
+	# 			type_classes[j].update(type_classes[i])
+	# res1 = set(map(frozenset, type_classes1))
+	# print("Number of classes: ", len(res1))
+	# t = res.difference(res1)
+	# for t1 in t:
+	# 	print(t1)
+	# for i, t in enumerate(res):
+	# 	print(i, "[ of length ", len(t) ,"]: ", t)
+		
+    
+		
