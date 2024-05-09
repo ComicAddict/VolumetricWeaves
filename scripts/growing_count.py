@@ -44,6 +44,9 @@ def mirrorY(w,N):
 def mirrorZ(w,N):
 	return (2**N-1-w[0], 2**N-1-w[1], 2**N-1-reverseBits(w[2], N))
 
+def toint(w, N):
+	return (N**2 * w[2]) + (N * w[1]) + w[0]
+
 for m in range(0, 3):
 	all_types = set()
 	base_types = []
@@ -52,12 +55,23 @@ for m in range(0, 3):
 	print("Processing ", N, " length binary sequences")
 	c = 0
 	num_sequences = 2**(N)
+	visx = []
 	for i in range(num_sequences):
+		if i in visx:
+			continue
+		sx = list(map(lambda x: ((i << x) | (i >> N-x)) & (num_sequences-1), range(N)))
+		nsx = list(map(lambda x: num_sequences-1-x,sx))
+		sx_e = list(map(lambda x: ((i << x) | (i >> N-x)) & (num_sequences-1), range(0,N,2)))
+		visx.extend(sx_e)
 		for j in range(num_sequences):
+			sy = list(map(lambda x: ((j << x) | (j >> N-x)) & (num_sequences-1), range(N)))
+			nsy = list(map(lambda x: num_sequences-1-x,sy))
 			for k in range(num_sequences):
+				sz = list(map(lambda x: ((k << x) | (k >> N-x)) & (num_sequences-1), range(N)))
+				nsz = list(map(lambda x: num_sequences-1-x,sz))
+
 				current_items = set()
 				w = (i,j,k)
-				# current_items.update(mit.distinct_permutations(w))
 				current_items.add(w)
 				wx = rotateX(w, N)
 				wy = rotateY(w, N)
@@ -83,7 +97,10 @@ for m in range(0, 3):
 				for ii in range(N):
 					for jj in range(N):
 						for kk in range(N):
-							w1 = shiftZ(shiftY(shiftX(w,ii,N),jj,N),kk,N)
+							x = sx[ii] if (jj + kk) % 2 == 0 else nsx[ii]
+							y = sy[jj] if (ii + kk) % 2 == 0 else nsy[jj]
+							z = sz[kk] if (jj + ii) % 2 == 0 else nsz[kk]
+							w1 = (x,y,z)
 							current_items.add(w1)
 							wx = rotateX(w1, N)
 							wy = rotateY(w1, N)
@@ -107,22 +124,21 @@ for m in range(0, 3):
 							# current_items.add(mirrorX(w1, N))
 							# current_items.add(mirrorY(w1, N))
 							# current_items.add(mirrorZ(w1, N))
-							# current_items.update(mit.distinct_permutations(w1))
+				embed = list(map(lambda x: toint(x, num_sequences), current_items))
+				# isUniqueClass = True
+				# for t in type_classes:
+				# 	itemFound = False
+				# 	if t.intersection(current_items):
+				# 		t.update(current_items)
+				# 		isUniqueClass = False
 
-				isUniqueClass = True
-				for t in type_classes:
-					itemFound = False
-					if t.intersection(current_items):
-						t.update(current_items)
-						isUniqueClass = False
-
-				if isUniqueClass:
-					type_classes.append(current_items)
-				# if any(item in all_types for item in current_items):
-				# 	all_types.update(current_items)
-				# else:
-				# 	c += 1
-				# 	all_types.update(current_items)
+				# if isUniqueClass:
+				# 	type_classes.append(current_items)
+				if any(item in all_types for item in embed):
+					all_types.update(embed)
+				else:
+					c += 1
+					all_types.update(embed)
 	
 	# for c1, c2 in combinations(type_classes,2):
 	# 	if c1.intersection(c2):
@@ -130,6 +146,7 @@ for m in range(0, 3):
 	# 		c2.update(c1)
 	# res = set(map(frozenset, type_classes))
 	print("Number of classes: ", len(type_classes))
+	print("Number of classes: ", c)
 
 	# all_types1 = set()
 	# base_types = []
