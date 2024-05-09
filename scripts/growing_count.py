@@ -47,7 +47,7 @@ def mirrorZ(w,N):
 def toint(w, N):
 	return (N**2 * w[2]) + (N * w[1]) + w[0]
 
-for m in range(0, 3):
+for m in range(0, 1):
 	all_types = set()
 	base_types = []
 	type_classes = []
@@ -125,15 +125,15 @@ for m in range(0, 3):
 							# current_items.add(mirrorY(w1, N))
 							# current_items.add(mirrorZ(w1, N))
 				embed = list(map(lambda x: toint(x, num_sequences), current_items))
-				# isUniqueClass = True
-				# for t in type_classes:
-				# 	itemFound = False
-				# 	if t.intersection(current_items):
-				# 		t.update(current_items)
-				# 		isUniqueClass = False
+				isUniqueClass = True
+				for t in type_classes:
+					itemFound = False
+					if t.intersection(current_items):
+						t.update(current_items)
+						isUniqueClass = False
 
-				# if isUniqueClass:
-				# 	type_classes.append(current_items)
+				if isUniqueClass:
+					type_classes.append(current_items)
 				if any(item in all_types for item in embed):
 					all_types.update(embed)
 				else:
@@ -146,7 +146,12 @@ for m in range(0, 3):
 	# 		c2.update(c1)
 	# res = set(map(frozenset, type_classes))
 	print("Number of classes: ", len(type_classes))
-	print("Number of classes: ", c)
+	# print(type_classes)
+	for i, tc in enumerate(type_classes):
+		print("type ", i, " members:", len(tc))
+		for t in tc:
+			print("\t",t) 
+	# print("Number of classes: ", c)
 
 	# all_types1 = set()
 	# base_types = []
