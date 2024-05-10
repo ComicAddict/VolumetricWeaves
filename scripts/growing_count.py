@@ -47,7 +47,7 @@ def mirrorZ(w,N):
 def toint(w, N):
 	return (N**2 * w[2]) + (N * w[1]) + w[0]
 
-for m in range(0, 1):
+for m in range(0, 2):
 	all_types = set()
 	base_types = []
 	type_classes = []
@@ -146,11 +146,15 @@ for m in range(0, 1):
 	# 		c2.update(c1)
 	# res = set(map(frozenset, type_classes))
 	print("Number of classes: ", len(type_classes))
+	f = open(str(N)+"x"+str(N)+"x"+str(N)+"_classes.txt", "a")
 	# print(type_classes)
 	for i, tc in enumerate(type_classes):
-		print("type ", i, " members:", len(tc))
+		f.write("type "+ str(i)+ " members:"+ str(len(tc))+"\n")
+		# print()
 		for t in tc:
-			print("\t",t) 
+			f.write("\t"+str(t)+"\n")
+			# print()
+	f.close()
 	# print("Number of classes: ", c)
 
 	# all_types1 = set()
