@@ -105,12 +105,46 @@ def calculateTypes(N, mirror=False):
 		type_classes.append(tmp)
 	return type_classes, c
 	
+def find_transformation(w1, w2, N):
+	rotorder = ['x','x','z','x','x','z']
+	for ii in range(N):
+		for jj in range(N):
+			for kk in range(N):
+				tr = "shift{}-{}-{}".format(ii,jj,kk)
+				w = shiftZ(shiftY(shiftX(w2, ii, N), jj, N), kk, N)
+				if w1 == w:
+					return tr
+				# if mirror:
+				# 	tmp.add(mirrorZ(w,N))
+				for r in rotorder:
+					for ir in range(4):
+						tr += "-rotY-"
+						w = rotateY(w, N)
+						if w1 == w:
+							return tr
+						# if mirror:
+						# 	tmp.add(mirrorZ(w,N))
+					if r == 'x':
+						tr += "-rotX-"
+						w = rotateX(w, N)
+					elif r == 'z':
+						tr += "-rotZ-"
+						w = rotateZ(w, N)
+	return "no transform"
 
+w = (13,1,2)
+print(rotateX(w,4))
+print(rotateY(w,4))
+print(rotateZ(w,4))
+
+print(find_transformation((1,1,1),(13,1,2), 4))
+
+exit()
 for m in range(0, 3):
 	
 	N = (m+1) * 2
 	print("Processing ", N, " length binary sequences")
-	type_classes, c = calculateTypes(N, mirror=True)
+	type_classes, c = calculateTypes(N, mirror=False)
 	
 	
 	
@@ -126,6 +160,12 @@ for m in range(0, 3):
 		f.write("type "+ str(i)+ " members:"+ str(len(tc))+"\n")
 		for t in tc:
 			f.write("\t"+str(t)+"\n")
+	f.close()
+
+	f = open(str(N)+"x"+str(N)+"x"+str(N)+"_classes_short.txt", "w")
+	for i, tc in enumerate(type_classes):
+		f.write("type "+ str(i)+ " members:"+ str(len(tc))+"\n")
+		f.write("\t"+str(tc.pop())+"\n")
 	f.close()
 
 	# f = open(str(N)+"x"+str(N)+"x"+str(N)+"_classes_derivatives.txt", "w")
