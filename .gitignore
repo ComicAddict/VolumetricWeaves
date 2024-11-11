@@ -2,3 +2,7 @@
 /scripts/*.txt
 /houds/geo/*
 /houds/backup/*
+/poster_figs/
+/4-THREAD/
+*blendcache_*
+/fiigures/
